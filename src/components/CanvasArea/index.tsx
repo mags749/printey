@@ -5,9 +5,11 @@ import { useCanvasStore, inToPx, formatUnit } from "@/store/canvas-store"
 import type { CanvasImage } from "@/store/canvas-store"
 import { CANVAS_SCALE, SAFE_ZONE_IN, SNAP_THRESHOLD } from "./constant"
 import ImageNode from "./ImageNode"
+import { useTheme } from "../theme-provider"
 
 // ─── Main canvas ───────────────────────────────────────────────────────────────
 export const CanvasArea = () => {
+  const { isDarkTheme } = useTheme()
   const {
     unit,
     paperSettings,
@@ -167,20 +169,23 @@ export const CanvasArea = () => {
       parseInt(hex.slice(5, 7), 16) * 0.114 <
     186
 
+  if (imageLibrary.length === 0) {
+    return null
+  }
+
   return (
-    <div
+    <article
       ref={containerRef}
-      className="relative flex-1 overflow-scroll bg-[#0a0a0c]"
+      className="hide-scrollbar relative flex-1 overflow-scroll bg-background"
       style={{
-        backgroundImage:
-          "radial-gradient(circle, #1e1e24 1px, transparent 1px)",
+        backgroundImage: `radial-gradient(circle, ${isDarkTheme ? "#222021" : "#D3D3D3"} 1px, transparent 1px)`,
         backgroundSize: "24px 24px",
       }}
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
     >
       {/* ── Horizontal ruler ───────────────────────────────────────────────── */}
-      <div
+      <section
         className="pointer-events-none absolute z-10 flex items-end"
         style={{ left: offsetX, top: offsetY - 22, height: 20, width: paperW }}
       >
@@ -190,16 +195,20 @@ export const CanvasArea = () => {
             className="absolute flex flex-col items-center"
             style={{ left: t.pos, transform: "translateX(-50%)" }}
           >
-            <span className="font-mono text-[8px] text-white/30">
+            <span
+              className={`font-mono text-[8px] ${isDarkTheme ? "text-white" : "text-black"}/30`}
+            >
               {t.label}
             </span>
-            <div className="h-1.5 w-px bg-white/15" />
+            <div
+              className={`h-1.5px w-px bg-${isDarkTheme ? "white" : "black"}/15`}
+            />
           </div>
         ))}
-      </div>
+      </section>
 
       {/* ── Vertical ruler ─────────────────────────────────────────────────── */}
-      <div
+      <section
         className="pointer-events-none absolute z-10 flex flex-col items-end"
         style={{ left: offsetX - 22, top: offsetY, width: 20, height: paperH }}
       >
@@ -210,21 +219,23 @@ export const CanvasArea = () => {
             style={{ top: t.pos, transform: "translateY(-50%)" }}
           >
             <span
-              className="font-mono text-[8px] text-white/30"
+              className={`font-mono text-[8px] ${isDarkTheme ? "text-white" : "text-black"}/30`}
               style={{ writingMode: "vertical-lr" }}
             >
               {t.label}
             </span>
-            <div className="h-px w-1.5 bg-white/15" />
+            <div
+              className={`h-px w-1.5 bg-${isDarkTheme ? "white" : "black"}/15`}
+            />
           </div>
         ))}
-      </div>
+      </section>
 
       {/* ── Konva Stage ────────────────────────────────────────────────────── */}
       <Stage
         ref={stageRef}
-        width={containerSize.w}
-        height={containerSize.h + 40}
+        width={containerSize.w + 40}
+        height={(paperH ?? containerSize.h) + 40}
         onClick={(e) => {
           const target = e.target
           if (
@@ -366,7 +377,7 @@ export const CanvasArea = () => {
 
       {/* ── Empty state ─────────────────────────────────────────────────────── */}
       {canvasImages.length === 0 && (
-        <div
+        <section
           className="pointer-events-none absolute z-10 flex flex-col items-center justify-center text-center"
           style={{
             left: offsetX,
@@ -378,8 +389,8 @@ export const CanvasArea = () => {
           <p className="text-[11px] font-semibold tracking-widest text-black/20 uppercase">
             Drop images from the sidebar
           </p>
-        </div>
+        </section>
       )}
-    </div>
+    </article>
   )
 }

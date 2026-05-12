@@ -7,7 +7,7 @@ type SectionHeaderProps = {
 }
 
 const SectionHeader = ({ icon, label }: SectionHeaderProps) => (
-  <div className="flex items-center gap-2 px-3 py-2.5">
+  <section className="flex items-center gap-2 px-3 py-2.5">
     <HugeiconsIcon
       icon={icon}
       strokeWidth={1.5}
@@ -16,7 +16,7 @@ const SectionHeader = ({ icon, label }: SectionHeaderProps) => (
     <span className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
       {label}
     </span>
-  </div>
+  </section>
 )
 
 export default SectionHeader

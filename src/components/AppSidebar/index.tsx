@@ -31,6 +31,8 @@ import type { CanvasImage } from "@/store/canvas-store"
 import { cn, readImageFile } from "@/lib/utils"
 import SectionHeader from "./SectionHeader"
 import NumRow from "./NumRow"
+import NoContentView from "./NoContentView"
+import { Button } from "../ui/button"
 
 export const AppSidebar = () => {
   const {
@@ -53,7 +55,7 @@ export const AppSidebar = () => {
   } = useCanvasStore()
 
   const fileRef = useRef<HTMLInputElement>(null)
-  const [dragging, setDragging] = useState(false)
+  const [dragging, setDragging] = useState<boolean>(false)
 
   const activeImg = canvasImages.find((i) => i.id === activeImageId) ?? null
   const physW = activeImg
@@ -125,11 +127,34 @@ export const AppSidebar = () => {
     },
   ]
 
+  const imageInput = (
+    <input
+      ref={fileRef}
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      multiple
+      className="sr-only"
+      onChange={(e) => handleFiles(e.target.files)}
+    />
+  )
+
+  if (imageLibrary.length === 0) {
+    return (
+      <NoContentView
+        fileRef={fileRef}
+        handleFiles={handleFiles}
+        setDragging={setDragging}
+      >
+        {imageInput}
+      </NoContentView>
+    )
+  }
+
   return (
     <TooltipProvider>
       <aside className="flex h-full w-56 shrink-0 flex-col overflow-x-hidden overflow-y-auto border-r border-border bg-sidebar text-sidebar-foreground">
         {/* Upload zone */}
-        <div
+        <section
           className={cn(
             "relative flex cursor-pointer flex-col items-center gap-2 border-b border-border px-4 py-5 transition-colors",
             dragging ? "bg-primary/5" : "hover:bg-muted/50"
@@ -168,15 +193,8 @@ export const AppSidebar = () => {
               JPG · PNG · WebP
             </p>
           </div>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            multiple
-            className="sr-only"
-            onChange={(e) => handleFiles(e.target.files)}
-          />
-        </div>
+          {imageInput}
+        </section>
 
         {/* Library */}
         {imageLibrary.length > 0 && (
@@ -185,7 +203,7 @@ export const AppSidebar = () => {
               icon={FileImageIcon as IconSvgElement}
               label="Library"
             />
-            <div className="grid grid-cols-2 gap-1.5 px-3 pb-3">
+            <section className="grid grid-cols-2 gap-1.5 px-3 pb-3">
               {imageLibrary.map((img) => (
                 <div
                   key={img.id}
@@ -231,7 +249,7 @@ export const AppSidebar = () => {
                   </button>
                 </div>
               ))}
-            </div>
+            </section>
             <Separator />
           </>
         )}
@@ -244,13 +262,13 @@ export const AppSidebar = () => {
               label="Selection"
             />
 
-            <div className="mx-3 mb-2 flex items-center justify-center border border-primary/30 bg-primary/5 py-1.5">
+            <section className="mx-3 mb-2 flex items-center justify-center border border-primary/30 bg-primary/5 py-1.5">
               <span className="font-mono text-[11px] font-medium text-primary">
                 {formatUnit(physW, unit)} × {formatUnit(physH, unit)}
               </span>
-            </div>
+            </section>
 
-            <div className="flex items-center justify-between px-3 pb-2">
+            <section className="flex items-center justify-between px-3 pb-2">
               <span className="text-[11px] text-muted-foreground">
                 Lock aspect ratio
               </span>
@@ -270,7 +288,7 @@ export const AppSidebar = () => {
                 />
                 {lockAspectRatio ? "On" : "Off"}
               </button>
-            </div>
+            </section>
 
             <NumRow
               label={`Width (${unit})`}
@@ -316,11 +334,12 @@ export const AppSidebar = () => {
 
             <Separator className="my-2" />
 
-            <div className="grid grid-cols-3 gap-1 px-3 pb-3">
+            <section className="grid grid-cols-3 gap-1 px-3 pb-3">
               {layerActions.map(({ icon, label, action }) => (
                 <Tooltip key={label}>
                   <TooltipTrigger>
-                    <button
+                    <Button
+                      variant="outline"
                       onClick={action}
                       className="flex w-full flex-col items-center gap-1 border border-border py-2 text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
                     >
@@ -332,15 +351,15 @@ export const AppSidebar = () => {
                       <span className="text-[9px] font-semibold tracking-wider uppercase">
                         {label}
                       </span>
-                    </button>
+                    </Button>
                   </TooltipTrigger>
                   <TooltipContent>{label}</TooltipContent>
                 </Tooltip>
               ))}
-            </div>
+            </section>
 
-            <div className="px-3 pb-4">
-              <button
+            <section className="px-3 pb-4">
+              <Button
                 onClick={() => removeCanvasImage(activeImg.id)}
                 className="flex w-full items-center justify-center gap-2 border border-border py-1.5 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase transition-colors hover:border-destructive hover:text-destructive"
               >
@@ -350,15 +369,15 @@ export const AppSidebar = () => {
                   className="size-3"
                 />
                 Remove image
-              </button>
-            </div>
+              </Button>
+            </section>
             <Separator />
           </>
         ) : (
-          <div className="px-4 py-4 text-[11px] leading-relaxed text-muted-foreground">
+          <section className="px-4 py-4 text-[11px] leading-relaxed text-muted-foreground">
             Click an image on the canvas to select and edit it, or drag from the
             library above.
-          </div>
+          </section>
         )}
 
         {/* Layers list */}
@@ -368,7 +387,7 @@ export const AppSidebar = () => {
               icon={LayerIcon as IconSvgElement}
               label={`Layers (${canvasImages.length})`}
             />
-            <div className="flex flex-col gap-0.5 px-2 pb-4">
+            <section className="flex flex-col gap-0.5 px-2 pb-4">
               {[...canvasImages]
                 .sort((a, b) => b.zIndex - a.zIndex)
                 .map((img) => (
@@ -395,7 +414,7 @@ export const AppSidebar = () => {
                     </span>
                   </button>
                 ))}
-            </div>
+            </section>
           </>
         )}
       </aside>

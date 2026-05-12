@@ -15,7 +15,7 @@ const NumRow = ({
   max,
   onChange,
 }: NumRowProps) => (
-  <div className="flex items-center justify-between px-3 py-0.5">
+  <section className="flex items-center justify-between px-3 py-0.5">
     <span className="text-[11px] text-muted-foreground">{label}</span>
     <input
       type="number"
@@ -26,7 +26,7 @@ const NumRow = ({
       onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
       className="h-6 w-24 border border-transparent border-b-border bg-transparent px-0 text-right font-mono text-[11px] outline-none focus:border-b-ring"
     />
-  </div>
+  </section>
 )
 
 export default NumRow
